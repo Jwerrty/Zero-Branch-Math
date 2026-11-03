@@ -39,12 +39,12 @@
 > **提示:**若图片加载有问题，可进入assets文件夹查看
 
 ### particle: 10万粒子曼陀罗渲染
-![System Math](https://github.com/user-attachments/assets/1e8ce208-8b7a-4cdc-b6cb-48c1b6a7fabf)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/b2444428-4d05-4120-a161-906921a85ebe)
+![System Math](https://github.com/user-attachments/assets/d7ff85c5-4fb5-411d-ab36-4e1d0ef5a090)
+![Zero-Branch-Math](https://github.com/user-attachments/assets/3526c290-f037-4684-ad6b-45e7d26effc1)
 
 ### 四叶草
-![System Math](https://github.com/user-attachments/assets/1b9e8d9c-9dc9-4785-a048-9a0d88755742)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/cd9e5217-dfd1-4b4f-9b4a-172212c05080)
+![System Math](https://github.com/user-attachments/assets/3ac350cd-24e5-444c-9bd7-d11b587952a1)
+![Zero-Branch-Math](https://github.com/user-attachments/assets/3b24e09a-30ea-4280-844c-a0d7156b8f56)
 
 
 ## 📦 支持的算子

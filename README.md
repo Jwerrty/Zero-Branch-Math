@@ -39,12 +39,12 @@ Through extreme value approximation and Estrin's scheme evaluation structure, co
 > **Note:** If images fail to load, please navigate to the `assets` folder in the repository to view them.
 
 ### 100,000 Particles Mandala Rendering
-![System Math](https://github.com/user-attachments/assets/1e8ce208-8b7a-4cdc-b6cb-48c1b6a7fabf)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/b2444428-4d05-4120-a161-906921a85ebe)
+![System Math](https://github.com/user-attachments/assets/d7ff85c5-4fb5-411d-ab36-4e1d0ef5a090)
+![Zero-Branch-Math](https://github.com/user-attachments/assets/3526c290-f037-4684-ad6b-45e7d26effc1)
 
 ### four-leaf-clover
-![System Math](https://github.com/user-attachments/assets/1b9e8d9c-9dc9-4785-a048-9a0d88755742)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/cd9e5217-dfd1-4b4f-9b4a-172212c05080)
+![System Math](https://github.com/user-attachments/assets/3ac350cd-24e5-444c-9bd7-d11b587952a1)
+![Zero-Branch-Math](https://github.com/user-attachments/assets/3b24e09a-30ea-4280-844c-a0d7156b8f56)
 
 
 ## 📦 Supported Operators
