@@ -42,6 +42,8 @@ Through extreme value approximation and Estrin's scheme evaluation structure, co
 The text is empty.
 > **💡 Regarding Accuracy:** Due to the inherent limitations of single-precision (float32) in representing extremely small values, the maximum absolute error for `fast_tanh` is `5.6e-03`. However, in real-world applications, the final coordinate drift is only `0.04` pixels, resulting in a visually perfect outcome. If you require an accuracy of `1e-06` across the entire range, please contact the author for a customized version.
 
+</details>
+
 ## 📽️ Demo Presentation
 
 > **Note:** If images fail to load, please navigate to the `assets` folder in the repository to view them.
