@@ -3,6 +3,8 @@
 [点击查看中文介绍](README_zh.md)
 
 > **Ultra-Fast Branchless Math Library — Designed for Game Physics Engines, Real-Time Rendering, and AI Inference.**
+>
+> The license used by this project is: `Apache-2.0`
 
 Through extreme value approximation and Estrin's scheme evaluation structure, complex transcendental functions (such as `sin`, `cos`, `tanh`) are collapsed into pure FMA (Fused Multiply-Add) instructions. By removing slow branch judgments and exception handling found in standard libraries, we maximize instruction-level parallelism (ILP) directly on the silicon.
 
@@ -24,6 +26,7 @@ Through extreme value approximation and Estrin's scheme evaluation structure, co
 <summary><b>👉 Click to view detailed benchmark and physical simulation data</b></summary>
 
 #### Core Operator Baseline Testing
+
 | Operator | Time (s) | Acceleration Ratio | Accuracy Performance |
 | --- | --- | --- | --- |
 | `sin / cos / tanh` (averaged over 1 billion) | 0.0136 (std: 0.0362) | **2.65x** | Error < 5.6e-03 |
@@ -33,13 +36,14 @@ Through extreme value approximation and Estrin's scheme evaluation structure, co
 | `exp(x)` | 0.0072 (standard deviation: 0.0050) | 0.69x | Error < 1e-05 (Note 1) |
 
 2. 100,000-particle complex physics simulation (with nonlinear damping and high-frequency superposition)
+
 | Operator Library | Physical Execution Time (ms) | Speedup Factor | Maximum Coordinate Deviation Error |
 | --- | --- | --- | --- |
 | System `std::` | 7.75 | 1.00x | 0.0 (Baseline) |
 | **Zero-Branch-Math** | **3.77** | **2.05x** | **4.14e-02 (Imperceptible at the pixel level)** |
 
-**Note 1 (`std::exp` specific instructions):** On modern desktop-class x86 CPUs, `std::exp` utilizes underlying hardware instructions (such as `MUFU.EX2`) for acceleration, making pure software implementations difficult to match in terms of speed. `fast_exp` is primarily intended for **embedded devices (ARM MCUs, RISC-V) without hardware FPU**, as a software fallback option.
-The text is empty.
+>**Note 1 (`std::exp` specific instructions):** On modern desktop-class x86 CPUs, `std::exp` utilizes underlying hardware instructions (such as `MUFU.EX2`) for acceleration, making pure software implementations difficult to match in terms of speed. `fast_exp` is primarily intended for **embedded devices (ARM MCUs, RISC-V) without hardware FPU**, as a software fallback option.
+>
 > **💡 Regarding Accuracy:** Due to the inherent limitations of single-precision (float32) in representing extremely small values, the maximum absolute error for `fast_tanh` is `5.6e-03`. However, in real-world applications, the final coordinate drift is only `0.04` pixels, resulting in a visually perfect outcome. If you require an accuracy of `1e-06` across the entire range, please contact the author for a customized version.
 
 </details>
@@ -147,10 +151,6 @@ Zero-Branch-Math/
 │
 └── assets/                    # Assets: Demo images
 ```
-
-## License
-
-The license used by this project is: `Apache-2.0`
 
 ## Contact
 Are you looking for custom ultra-fast FMA kernels for proprietary math formulas (e.g., specific NN architectures or simulation models)? The underlying E-Meta-Operator code generation engine is available for enterprise licensing. Contact: `Email: azqwerrty@163.com`
