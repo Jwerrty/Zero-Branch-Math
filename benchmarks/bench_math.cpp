@@ -43,7 +43,6 @@ int main() {
     end = high_resolution_clock::now();
     duration<double> time_fast = end - start;
 
-    // 3. 精度对比 (单次抽样对比)
     float max_err = 0.0f;
     double rmse = 0.0;
     for(int i=0; i<NUM_DATA; ++i) {
@@ -72,7 +71,6 @@ int main() {
     cout << "Max Absolute Error   : " << max_err << endl;
     cout << "Root Mean Sq. Error  : " << rmse << endl;
     
-    // 防止编译器优化掉结果
     if(sum == 123.456f) cout << sum << endl; 
 
     return 0;
