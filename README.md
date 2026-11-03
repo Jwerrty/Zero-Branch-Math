@@ -76,6 +76,7 @@ The currently open-sourced pure C++ version includes the following high-frequenc
 *   `fast_erf(x)`: 1.33x speedup
 *   `fast_log(x)`: 1.22x speed improvement
 *   `fast_exp(x)`: A software fallback solution designed specifically for embedded devices without a built-in floating-point unit (FPU).
+*   `atan2(x)`
 
 
 *(Error controlled at the `1e-06` level, perfectly meeting the needs of graphics and AI inference)*
