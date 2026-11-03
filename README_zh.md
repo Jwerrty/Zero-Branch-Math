@@ -10,42 +10,60 @@
 
 > 测试环境：Windows 11 / GCC 13.2 (`-O3 -march=native -fopenmp`) / 多核并发
 
-### 纯数学算子极限吞吐 (1 亿次 sin/cos/tanh 混合计算)
-| 算子库 | 耗时 (s) | 吞吐量 (Mops/s) | 加速比 | 最大绝对误差 |
-| :--- | :--- | :--- | :--- | :--- |
-| System `std::` | 0.0362 | 2073.5 | 1.00x | 0.0 (基准) |
-| **Zero-Branch-Math** | **0.0136** | **5509.0** | **2.65x** | **5.60e-03** |
+### 🚀 极端案例分析：1900+帧/秒的实时 SDF 渲染效果（纯 CPU 实现）
 
-### 10 万粒子复杂物理模拟 (带非线性阻尼与高频叠加)
+*   **任务**：渲染一个复杂的 1000x1000 尺寸的 SDF 图形，具有平滑的 `erf` 抗锯齿效果以及谐波失真效果。
+*   **技术架构**：原生 Win32 API、无锁线程池（支持 16 核处理器）、Zero-Branch-Math 计算引擎。
+
+| 引擎 | 计算时间（毫秒） | 帧率（FPS） | 加速比 |
+| :--- | :--- | :--- | :--- |
+| `std::`系统 | 2.57 ms | 325.8 | 1.00x |
+| **Zero-Branch-Math** | **0.75 ms** | **1903.1** | **3.42x** |
+
+<details>
+<summary><b>👉 点击展开查看详细基准与物理模拟数据 (Click to expand)</b></summary>
+
+#### 核心算子微基准测试
+| 算子 | 耗时 (s) | 加速比 | 精度表现 |
+| :--- | :--- | :--- | :--- |
+| `sin / cos / tanh` (混合 1 亿次) | 0.0136 (std: 0.0362) | **2.65x** | 误差 < 5.6e-03 |
+| `atan2(y,x)` (四象限查询) | 0.0180 (std: 0.0367) | **2.03x** | 误差 < 4.7e-07 rad |
+| `erf(x)` | 0.0069 (std: 0.0093) | **1.33x** | 误差 < 1e-04 |
+| `log(x)` | 0.0052 (std: 0.0064) | **1.22x** | 误差 < 1e-05 |
+| `exp(x)` | 0.0072 (std: 0.0050) | 0.69x | 误差 < 1e-05 (注1) |
+
+#### 2. 10 万粒子复杂物理模拟 (带非线性阻尼与高频叠加)
 | 算子库 | 物理耗时 (ms) | 加速比 | 最大坐标漂移误差 |
 | :--- | :--- | :--- | :--- |
 | System `std::` | 7.75 | 1.00x | 0.0 (基准) |
 | **Zero-Branch-Math** | **3.77** | **2.05x** | **4.14e-02 (像素级完全不可见)** |
 
+> **注 1 (`exp` 的特别说明)**：在现代桌面级 x86 CPU 上，`std::exp` 具有底层硬件指令（如 `MUFU.EX2`）加速，纯软件多项式很难在速度上超越硬件。`fast_exp` 主要面向**无硬件 FPU 的嵌入式设备（ARM MCU, RISC-V）**，作为软件后备方案。
+> 
 > **💡 关于精度说明**：由于单精度（float32）在极小值域拟合的物理极限，`fast_tanh` 的最大绝对误差为 `5.6e-03`。然而在真实的物理引擎累加中，最终坐标漂移仅有 `0.04` 个像素，视觉效果绝对完美。如果您需要全区间 `1e-06` 的极限精度，请联系作者获取定制版本。
 
-### 🚀 极端案例分析：1900+帧/秒的实时 SDF 渲染效果（纯 CPU 实现）
-
-*   **任务**：渲染一个复杂的 1000x1000 尺寸的 SDF 图形，该图形具有平滑的“erf”抗锯齿效果以及谐波失真效果。
-*   **技术架构**：原生 Win32 API、无锁线程池（支持 16 核处理器）、Zero-Branch-Math 计算引擎。
-
-| 引擎 | 计算时间（毫秒） | 帧率（FPS） | 加速比 |
-| :--- | :--- | :--- | :--- |
-| `std::`系统 | 2.57 毫秒 | 325.8 | 1.00 倍 |
-| **Zero-Branch-Math** | **0.75 毫秒** | **1903.1** | **3.42 倍** |
+</details>
 
 ## Demo 演示
 
 > **提示:**若图片加载有问题，可进入assets文件夹查看
 
-### particle: 10万粒子曼陀罗渲染
-![System Math](https://github.com/user-attachments/assets/d7ff85c5-4fb5-411d-ab36-4e1d0ef5a090)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/3526c290-f037-4684-ad6b-45e7d26effc1)
+### 极光
+![aurora](assets/aurora-atan2/aurora.jpg)
+
+<details>
+<summary><b>更多图片展示</b></summary>
+
+### atan2
+![atan2](assets/atan2/atan2.jpg)
+
+### 10万粒子曼陀罗渲染
+![particle](assets/particle/particle.jpg)
 
 ### 四叶草
-![System Math](https://github.com/user-attachments/assets/3ac350cd-24e5-444c-9bd7-d11b587952a1)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/3b24e09a-30ea-4280-844c-a0d7156b8f56)
+![FourLeafClover](assets/four-leaf-clover/four-leaf-clover.jpg)
 
+</details>
 
 ## 📦 支持的算子
 
@@ -57,6 +75,7 @@
 *   `fast_erf(x)`：1.33x speedup
 *   `fast_log(x)`：1.22x speedup
 *   `fast_exp(x)`：专为无 FPU 嵌入式设备设计的软件后备方案
+*   `fast_atan2(x)`
 
 *(误差控制在 `1e-06` 级别，完美满足图形学与 AI 推理需求)*
 

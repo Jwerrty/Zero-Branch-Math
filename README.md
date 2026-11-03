@@ -6,45 +6,62 @@
 
 Through extreme value approximation and Estrin's scheme evaluation structure, complex transcendental functions (such as `sin`, `cos`, `tanh`) are collapsed into pure FMA (Fused Multiply-Add) instructions. By removing slow branch judgments and exception handling found in standard libraries, we maximize instruction-level parallelism (ILP) directly on the silicon.
 
-## ⚡ Benchmarks
+## ⚡ Performance Benchmarks
 
-> Test Environment: Windows 11 / GCC 13.2 (`-O3 -march=native -fopenmp`) / Multi-core
+> Test environment: Windows 11 / GCC 13.2 (`-O3 -march=native -fopenmp`) / Multi-core, concurrent
 
-### 1. Pure Math Operators Throughput (100M mixed sin/cos/tanh calculations)
-| Library | Time (s) | Throughput (Mops/s) | Speedup | Max Absolute Error |
-| :--- | :--- | :--- | :--- | :--- |
-| System `std::` | 0.0362 | 2073.5 | 1.00x | 0.0 (Baseline) |
-| **Zero-Branch-Math** | **0.0136** | **5509.0** | **2.65x** | **5.60e-03** |
+### 🚀 Extreme Case Study: Real-time SDF Rendering with 1900+ FPS (Pure CPU Implementation)
 
-### 2. 100K Particle Complex Physics Simulation (with non-linear damping)
-| Library | Physics Time (ms) | Speedup | Max Coordinate Drift |
-| :--- | :--- | :--- | :--- |
-| System `std::` | 7.75 | 1.00x | 0.0 (Baseline) |
-| **Zero-Branch-Math** | **3.77** | **2.05x** | **4.14e-02 (Visually identical)** |
+*   **Task:** Render a complex 1000x1000 image with smooth "erf" anti-aliasing and harmonic distortion effects.
+*   **Technical Architecture:** Native Win32 API, lock-free thread pool (supporting 16-core processors), Zero-Branch-Math calculation engine.
 
-> **💡 Note on Precision**: Due to the physical limits of single-precision (float32) fitting in specific ranges, the maximum absolute error of `fast_tanh` is `5.6e-03`. However, in the real physics engine accumulation, the final coordinate drift is only `0.04` pixels, making the visual effect perfect. If you require extreme precision of `1e-06` across the full range, please contact the author for a customized version.
-
-### 🚀 Extreme Case Study: 1900+ FPS Real-time SDF Rendering (Pure CPU)
-
-*   **Task**: Render a complex 1000x1000 SDF (Signed Distance Field) Clover with smooth `erf` anti-aliasing and harmonic distortion.
-*   **Tech Stack**: Native Win32 API, Lock-free Thread Pool (16 Cores), Zero-Branch-Math.
-
-| Engine | Calc Time (ms) | Framerate (FPS) | Speedup |
-| :--- | :--- | :--- | :--- |
-| System `std::` | 2.57 ms | 325.8 | 1.00x |
+| Engine | Calculation Time (ms) | Frame Rate (FPS) | Performance Ratio |
+| --- | --- | --- | --- |
+| `std::` system | 2.57 ms | 325.8 | 1.00x |
 | **Zero-Branch-Math** | **0.75 ms** | **1903.1** | **3.42x** |
+
+<details>
+<summary><b>👉 Click to view detailed benchmark and physical simulation data</b></summary>
+
+#### Core Operator Baseline Testing
+| Operator | Time (s) | Acceleration Ratio | Accuracy Performance |
+| --- | --- | --- | --- |
+| `sin / cos / tanh` (averaged over 1 billion) | 0.0136 (std: 0.0362) | **2.65x** | Error < 5.6e-03 |
+| `atan2(y,x)` (quadrant query) | 0.0180 (std: 0.0367) | **2.03x** | Error < 4.7e-07 rad |
+| `erf(x)` | 0.0069 (standard deviation: 0.0093) | **1.33x** | Error < 1e-04 |
+| `log(x)` | 0.0052 (standard deviation: 0.0064) | **1.22x** | Error < 1e-05 |
+| `exp(x)` | 0.0072 (standard deviation: 0.0050) | 0.69x | Error < 1e-05 (Note 1) |
+
+2. 100,000-particle complex physics simulation (with nonlinear damping and high-frequency superposition)
+| Operator Library | Physical Execution Time (ms) | Speedup Factor | Maximum Coordinate Deviation Error |
+| --- | --- | --- | --- |
+| System `std::` | 7.75 | 1.00x | 0.0 (Baseline) |
+| **Zero-Branch-Math** | **3.77** | **2.05x** | **4.14e-02 (Imperceptible at the pixel level)** |
+
+**Note 1 (`std::exp` specific instructions):** On modern desktop-class x86 CPUs, `std::exp` utilizes underlying hardware instructions (such as `MUFU.EX2`) for acceleration, making pure software implementations difficult to match in terms of speed. `fast_exp` is primarily intended for **embedded devices (ARM MCUs, RISC-V) without hardware FPU**, as a software fallback option.
+The text is empty.
+> **💡 Regarding Accuracy:** Due to the inherent limitations of single-precision (float32) in representing extremely small values, the maximum absolute error for `fast_tanh` is `5.6e-03`. However, in real-world applications, the final coordinate drift is only `0.04` pixels, resulting in a visually perfect outcome. If you require an accuracy of `1e-06` across the entire range, please contact the author for a customized version.
 
 ## 📽️ Demo Presentation
 
 > **Note:** If images fail to load, please navigate to the `assets` folder in the repository to view them.
 
+### aurora
+![aurora](assets/aurora-atan2/aurora.jpg)
+
+<details>
+<summary><b>more pictures</b></summary>
+
+### atan2
+![atan2](assets/atan2/atan2.jpg)
+
 ### 100,000 Particles Mandala Rendering
-![System Math](https://github.com/user-attachments/assets/d7ff85c5-4fb5-411d-ab36-4e1d0ef5a090)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/3526c290-f037-4684-ad6b-45e7d26effc1)
+![particle](assets/particle/particle.jpg)
 
 ### four-leaf-clover
-![System Math](https://github.com/user-attachments/assets/3ac350cd-24e5-444c-9bd7-d11b587952a1)
-![Zero-Branch-Math](https://github.com/user-attachments/assets/3b24e09a-30ea-4280-844c-a0d7156b8f56)
+![FourLeafClover](assets/four-leaf-clover/four-leaf-clover.jpg)
+
+</details>
 
 
 ## 📦 Supported Operators
