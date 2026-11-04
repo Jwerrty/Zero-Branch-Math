@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul
 echo 正在使用 GCC 编译性能测试 (开启 -O3 极限优化)...
-g++ -O3 -march=native -fopenmp bench_math.cpp -o bench_math.exe -static -I ../include/cpu/
-g++ -O3 -march=native -fopenmp bench_particle.cpp -o bench_particle.exe -static -I ../include/cpu/
-g++ -O3 -march=native -fopenmp bench_next_ops.cpp -o bench_next_ops.exe -static -I ../include/cpu/
-g++ -O3 -march=native -fopenmp bench_atan2.cpp -o bench_atan2.exe -static -I ../include/cpu/
-g++ -O3 -march=native -fopenmp bench_rsqrt.cpp -o bench_rsqrt.exe -static -I ../include/cpu/
+g++ -O3 -march=native -fopenmp bench_math.cpp -o bench_math.exe -static -I ../include
+g++ -O3 -march=native -fopenmp bench_particle.cpp -o bench_particle.exe -static -I ../include
+g++ -O3 -march=native -fopenmp bench_next_ops.cpp -o bench_next_ops.exe -static -I ../include
+g++ -O3 -march=native -fopenmp bench_atan2.cpp -o bench_atan2.exe -static -I ../include
+g++ -O3 -march=native -fopenmp bench_rsqrt.cpp -o bench_rsqrt.exe -static -I ../include
 
 echo.
 echo ===================================================

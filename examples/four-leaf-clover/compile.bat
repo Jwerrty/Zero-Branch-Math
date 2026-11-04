@@ -1,6 +1,6 @@
 @echo off
 echo Compiling 100K Particle Mandala Demo...
-g++ -O3 -march=native -ffast-math -I../../include/cpu demo_erf.cpp -o demo_erf.exe -lgdi32 -luser32 -static -static-libgcc -static-libstdc++
+g++ -O3 -march=native -ffast-math -I../../include demo_erf.cpp -o demo_erf.exe -lgdi32 -luser32 -static -static-libgcc -static-libstdc++
 if %errorlevel% neq 0 (
     echo Compilation failed. Please check if GCC is installed and configured in the environment variables.
 ) else (

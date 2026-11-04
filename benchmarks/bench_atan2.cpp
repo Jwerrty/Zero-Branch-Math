@@ -4,7 +4,7 @@
 #include <random>
 #include <iomanip>
 #include <omp.h>
-#include "fast_atan2.h"
+#include "zero_branch_math.h"
 
 using namespace std;
 using namespace std::chrono;

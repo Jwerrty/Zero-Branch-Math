@@ -9,10 +9,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
-#include "fast_math.h"
+#include "zero_branch_math.h"
 
 
-// 屏幕与粒子配置
 const int WIDTH = 800;
 const int HEIGHT = 800;
 const int NUM_PARTICLES = 100000;
@@ -24,7 +23,6 @@ struct Particle {
     float layer;
 };
 
-// 全局变量
 std::vector<Particle> particles(NUM_PARTICLES);
 std::vector<float> out_x(NUM_PARTICLES);
 std::vector<float> out_y(NUM_PARTICLES);
@@ -32,14 +30,12 @@ bool use_fast_math = false;
 float time_val = 0.0f;
 float calc_time = 0.0f;
 
-// 双缓冲位图数据
 uint32_t* buffer = nullptr;
 BITMAPINFO bmi = {0};
 HDC memDC = nullptr;
 HBITMAP memBitmap = nullptr;
 HBITMAP oldBitmap = nullptr;
 
-// 物理更新函数 (整合自 particle_engine.cpp)
 void update_physics() {
     float cx = WIDTH * 0.5f;
     float cy = HEIGHT * 0.5f;
@@ -51,7 +47,6 @@ void update_physics() {
         float layer = particles[i].layer;
         
         float dummy = 0.0f;
-        // 暴力计算 50 次
         for(int j = 0; j < 50; ++j) {
             float phase = theta + j * 0.1f + layer;
             float s, c, t;
@@ -83,7 +78,6 @@ void update_physics() {
     calc_time = duration.count();
 }
 
-// 初始化粒子
 void init_particles() {
     for (int i = 0; i < NUM_PARTICLES; ++i) {
         float theta = ((float)rand() / RAND_MAX) * 2.0f * 3.14159f - 3.14159f;
@@ -95,7 +89,6 @@ void init_particles() {
     }
 }
 
-// 窗口过程
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg == WM_DESTROY) {
         PostQuitMessage(0);
@@ -108,7 +101,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-// 渲染一帧
 void render_frame(HWND hwnd, float fps) {
     // 清空背景为深紫色
     for (int i = 0; i < WIDTH * HEIGHT; ++i) {
@@ -118,7 +110,6 @@ void render_frame(HWND hwnd, float fps) {
     float cx = WIDTH * 0.5f;
     float cy = HEIGHT * 0.5f;
     
-    // 画粒子
     for (int i = 0; i < NUM_PARTICLES; ++i) {
         int px = (int)out_x[i];
         int py = (int)out_y[i];
@@ -126,42 +117,44 @@ void render_frame(HWND hwnd, float fps) {
         if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
             float dx = px - cx;
             float dy = py - cy;
-            float dist = std::sqrt(dx*dx + dy*dy);
-            float angle = std::atan2(dy, dx);
+            
+            float r2 = dx*dx + dy*dy + 0.1f; // 防止除零
+            float inv_dist = use_fast_math ? fast_rsqrt(r2) : 1.0f / std::sqrt(r2);
+            float dist = 1.0f / inv_dist; // 还原真实距离
+            
+            float angle = use_fast_math ? fast_atan2(dy, dx) : std::atan2(dy, dx);
             
             float norm_dist = std::clamp(dist / 400.0f, 0.0f, 1.0f);
             float fade = 1.0f - norm_dist;
             
             uint8_t r, g, b;
             if (use_fast_math) {
-                // 绿蓝赛博风
-                r = (uint8_t)((std::sin(angle * 2.0f + time_val) * 0.5f + 0.5f) * 255 * fade);
-                g = (uint8_t)((std::cos(angle * 3.0f + time_val) * 0.5f + 0.5f) * 255 * fade);
+                float s_val = fast_sin(angle * 2.0f + time_val);
+                float c_val = fast_cos(angle * 3.0f + time_val);
+                r = (uint8_t)((s_val * 0.5f + 0.5f) * 255 * fade);
+                g = (uint8_t)((c_val * 0.5f + 0.5f) * 255 * fade);
                 b = (uint8_t)(255 * fade);
             } else {
-                // 红黄烈火风
+                float s_val = std::sin(angle * 2.0f + time_val);
+                float c_val = std::cos(angle * 3.0f + time_val);
                 r = (uint8_t)(255 * fade);
-                g = (uint8_t)((std::sin(angle * 2.0f + time_val) * 0.5f + 0.5f) * 255 * fade);
-                b = (uint8_t)((std::cos(angle * 3.0f + time_val) * 0.5f + 0.5f) * 255 * fade);
+                g = (uint8_t)((s_val * 0.5f + 0.5f) * 255 * fade);
+                b = (uint8_t)((c_val * 0.5f + 0.5f) * 255 * fade);
             }
             
-            // 中心高亮白光
             if (dist < 50.0f) {
                 r = 255; g = 255; b = 255;
             }
 
-            // 写入位图 (BGRA 格式)
             buffer[py * WIDTH + px] = (255 << 24) | (r << 16) | (g << 8) | b;
         }
     }
     
-    // 将内存位图拷贝到屏幕
     SetDIBitsToDevice(
         memDC, 0, 0, WIDTH, HEIGHT, 0, 0, 0, HEIGHT,
         buffer, &bmi, DIB_RGB_COLORS
     );
 
-    // 打印文字
     char text[256];
     const char* mode = use_fast_math ? "FAST MATH" : "SYSTEM MATH";
     sprintf(text, "%s | Calc Time: %.2f ms | FPS: %.1f", mode, calc_time, fps);
@@ -173,7 +166,6 @@ void render_frame(HWND hwnd, float fps) {
     SetTextColor(memDC, RGB(200, 200, 200));
     TextOutA(memDC, 20, HEIGHT - 40, "Press [SPACE] to switch algorithm", 33);
 
-    // 刷新窗口
     HDC hdc = GetDC(hwnd);
     BitBlt(hdc, 0, 0, WIDTH, HEIGHT, memDC, 0, 0, SRCCOPY);
     ReleaseDC(hwnd, hdc);
@@ -183,7 +175,6 @@ int main() {
     srand(1337);
     init_particles();
 
-    // 注册窗口类
     const char CLASS_NAME[] = "MetaOperatorDemo";
     WNDCLASS wc = {0};
     wc.lpfnWndProc = WindowProc;
@@ -191,7 +182,6 @@ int main() {
     wc.lpszClassName = CLASS_NAME;
     RegisterClass(&wc);
 
-    // 创建窗口 (调整窗口大小以匹配客户区 800x800)
     RECT rect = {0, 0, WIDTH, HEIGHT};
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
     HWND hwnd = CreateWindowEx(
@@ -201,14 +191,13 @@ int main() {
         NULL, NULL, GetModuleHandle(NULL), NULL
     );
 
-    // 初始化 GDI 双缓冲位图
     HDC hdc = GetDC(hwnd);
     memDC = CreateCompatibleDC(hdc);
     ReleaseDC(hwnd, hdc);
 
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = WIDTH;
-    bmi.bmiHeader.biHeight = -HEIGHT; // 负数表示自顶向下
+    bmi.bmiHeader.biHeight = -HEIGHT;
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
@@ -219,7 +208,6 @@ int main() {
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
 
-    // 计时器
     LARGE_INTEGER frequency, lastTime, currentTime;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&lastTime);
@@ -229,7 +217,6 @@ int main() {
     float fpsTimer = 0.0f;
     int frames = 0;
 
-    // 主循环
     while (true) {
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT) goto cleanup;
@@ -241,14 +228,11 @@ int main() {
         float dt = (float)(currentTime.QuadPart - lastTime.QuadPart) / frequency.QuadPart;
         lastTime = currentTime;
         
-        // 防止第一帧过大
         if (dt > 0.1f) dt = 0.1f;
         time_val += dt;
 
-        // 计算物理
         update_physics();
 
-        // 计算 FPS
         frames++;
         fpsTimer += dt;
         if (fpsTimer >= 0.5f) {
@@ -257,7 +241,6 @@ int main() {
             fpsTimer = 0.0f;
         }
 
-        // 渲染
         render_frame(hwnd, fps);
     }
 

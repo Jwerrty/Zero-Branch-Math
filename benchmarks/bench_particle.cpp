@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <omp.h>
-#include "fast_math.h"
+#include "zero_branch_math.h"
 
 using namespace std;
 using namespace std::chrono;

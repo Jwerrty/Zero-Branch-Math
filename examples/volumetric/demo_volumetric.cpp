@@ -4,9 +4,7 @@
 #include <cstdint>
 #include <process.h>
 
-#include "fast_math.h"        
-#include "fast_math_next.h"   
-#include "fast_atan2.h"       
+#include "zero_branch_math.h"    
 
 const int WIDTH = 800;
 const int HEIGHT = 800;

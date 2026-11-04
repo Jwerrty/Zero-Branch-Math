@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <omp.h>
 #include <xmmintrin.h>
-#include "fast_rsqrt_.h"
+#include "zero_branch_math.h"
 
 using namespace std;
 using namespace std::chrono;

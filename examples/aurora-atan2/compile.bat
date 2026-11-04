@@ -5,7 +5,7 @@ echo ===================================================
 echo Compiling Zero-Branch-Math Aurora Demo...
 echo ===================================================
 
-g++ -O3 -march=native -ffast-math  demo_aurora.cpp -o demo_aurora.exe -lgdi32 -luser32 -static -static-libgcc -static-libstdc++ -I../../include/cpu
+g++ -O3 -march=native -ffast-math  demo_aurora.cpp -o demo_aurora.exe -lgdi32 -luser32 -static -static-libgcc -static-libstdc++ -I../../include
 
 if %errorlevel% neq 0 (
     echo.

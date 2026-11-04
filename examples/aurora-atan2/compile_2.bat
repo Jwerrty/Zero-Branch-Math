@@ -5,7 +5,7 @@ echo ===================================================
 echo Compiling Zero-Branch-Math Demo...
 echo ===================================================
 
-g++ -O3 -march=native -ffast-math  demo_atan2.cpp -o demo_atan2.exe -lgdi32 -luser32 -static -static-libgcc -static-libstdc++ -I../../include/cpu
+g++ -O3 -march=native -ffast-math  demo_atan2.cpp -o demo_atan2.exe -lgdi32 -luser32 -static -static-libgcc -static-libstdc++ -I../../include
 
 if %errorlevel% neq 0 (
     echo.
