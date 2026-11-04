@@ -12,7 +12,7 @@ Through extreme value approximation and Estrin's scheme evaluation structure, co
 
 > Test environment: Windows 11 / GCC 13.2 (`-O3 -march=native -fopenmp`) / Multi-core, concurrent
 
-### 🚀 Extreme Case Study: Real-time SDF Rendering with 1900+ FPS (Pure CPU Implementation)
+### 🚀 Real-time SDF Rendering with 1900+ FPS (Pure CPU Implementation)
 
 *   **Task:** Render a complex 1000x1000 image with smooth "erf" anti-aliasing and harmonic distortion effects.
 *   **Technical Architecture:** Native Win32 API, lock-free thread pool (supporting 16-core processors), Zero-Branch-Math calculation engine.
