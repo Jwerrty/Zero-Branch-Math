@@ -4,7 +4,7 @@
 #include <random>
 #include <iomanip>
 #include <omp.h>
-#include "../include/cpu/fast_atan2.h"
+#include "fast_atan2.h"
 
 using namespace std;
 using namespace std::chrono;

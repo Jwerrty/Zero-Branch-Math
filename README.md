@@ -72,22 +72,24 @@ Through extreme value approximation and Estrin's scheme evaluation structure, co
 
 ## 📦 Supported Operators
 
-The currently open-sourced pure C++ version includes the following high-frequency core operators (built-in single-cycle range reduction and saturation clamping, absolutely safe):
-
-*   `fast_sin(x)`: Fitted interval **[-π, π]**
-*   `fast_cos(x)`: Fitted interval **[-π, π]**
-*   `fast_tanh(x)`: Fitted interval \([-5, 5]\)
-*   `fast_erf(x)`: 1.33x speedup
-*   `fast_log(x)`: 1.22x speed improvement
-*   `fast_exp(x)`: A software fallback solution designed specifically for embedded devices without a built-in floating-point unit (FPU).
-*   `atan2(x)`
-
+| Operator | Description | Precision/Speedup |
+| :--- | :--- | :--- |
+| `fast_sin(x)` / `fast_cos(x)` | Fitted [-π, π], built-in range reduction | Error < 1e-06 |
+| `fast_tanh(x)` | Fitted [-5, 5], saturation clamping | Error < 5e-03 |
+| `fast_erf(x)` | AI Error Function, eliminates series expansion | **1.33x speedup** |
+| `fast_log(x)` | Fast logarithm, eliminates exception branches | **1.22x speedup** |
+| `fast_exp(x)` | Software fallback for embedded devices without FPUs | Error < 1e-05 |
+| `fast_atan2(y, x)` | Branchless spatial mapping for all quadrants | **2.03x speedup** |
+| `fast_rsqrt(x)` | IEEE 754 bit-hacking for `1/√x` | Error < 1e-06 |
 
 *(Error controlled at the `1e-06` level, perfectly meeting the needs of graphics and AI inference)*
 
-Next operators to be optimized:
+### Roadmap (Next Operators)
 
-* ` None `
+*   [ ] `fast_sincos(x, *s, *c)`: The core combo for graphics. Shares range reduction for both outputs, slashing time by half.
+*   [ ] `fast_pow(x, y)`: Ultra-fast power function composed from existing `fast_log` and `fast_exp`.
+*   [ ] `fast_sigmoid(x)`: Pure polynomial activation function for AI inference.
+*   [ ] `fast_asin(x)` / `fast_acos(x)`: Eliminates precision disasters near ±1 for shading.
 
 
 ---

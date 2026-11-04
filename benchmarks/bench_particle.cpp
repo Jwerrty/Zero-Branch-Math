@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <omp.h>
-#include "../include/cpu/fast_math.h"
+#include "fast_math.h"
 
 using namespace std;
 using namespace std::chrono;
