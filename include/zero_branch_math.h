@@ -3,25 +3,25 @@
 #include <cstdint>
 #include <cstring>
 
-#if defined(__clang__)
-    #define ZERO_BRANCH_FAST
-#elif defined(__GNUC__)
-    #define ZERO_BRANCH_FAST __attribute__((optimize("fast-math")))
+#if defined(__CUDACC__)
+    #define ZERO_BRANCH_FAST __device__ __forceinline__
+#elif defined(_MSC_VER)
+    #define ZERO_BRANCH_FAST __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+    #if defined(__clang__)
+        #define ZERO_BRANCH_FAST inline __attribute__((always_inline))
+    #else
+        #define ZERO_BRANCH_FAST inline __attribute__((always_inline)) __attribute__((optimize("fast-math")))
+    #endif
 #else
-    #define ZERO_BRANCH_FAST
-#endif
-
-#ifndef __CUDACC__
-#define __device__
-#define __forceinline__ inline
+    #define ZERO_BRANCH_FAST inline
 #endif
 
 // =========================================================
 // Zero-Branch-Math: Single-Header Extreme Math Library
 // =========================================================
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_sin(float x) {
+ZERO_BRANCH_FAST float fast_sin(float x) {
     const float TWO_PI_HI = 6.283185307179586f;
     const float TWO_PI_LO = 2.4492935982947064e-16f;
     float n = floorf(x * 0.15915494309189535f + 0.5f);
@@ -38,8 +38,7 @@ __device__ __forceinline__ float fast_sin(float x) {
     return poly;
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_cos(float x) {
+ZERO_BRANCH_FAST float fast_cos(float x) {
     const float TWO_PI_HI = 6.283185307179586f;
     const float TWO_PI_LO = 2.4492935982947064e-16f;
     float n = floorf(x * 0.15915494309189535f + 0.5f);
@@ -57,8 +56,7 @@ __device__ __forceinline__ float fast_cos(float x) {
     return sign * poly;
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_exp(float x) {
+ZERO_BRANCH_FAST float fast_exp(float x) {
     if (x != x) return x;
     if (x > 88.72283935546875f) return INFINITY;
     if (x < -103.97208404541016f) return 0.0f;
@@ -70,7 +68,7 @@ __device__ __forceinline__ float fast_exp(float x) {
     float xp_t_norm_1 = t_norm * t_norm;
     float xp_t_norm_2 = xp_t_norm_1 * xp_t_norm_1;
     float xp_t_norm_3 = xp_t_norm_2 * xp_t_norm_2;
-    float poly = (((((1.000000000004541f) + (0.3465735902890194f) * t_norm) + ((0.060056625807462106f) + (0.006938011720099898f) * t_norm) * xp_t_norm_1) + (((0.0006011625785226175f) + (4.172733231412691e-05f) * t_norm) + ((2.365903420097291e-06f) ) * xp_t_norm_1) * xp_t_norm_2) + (((6.125082344559473e-08f) * t_norm) + ((1.748460280931767e-08f) ) * xp_t_norm_1) * xp_t_norm_3);
+    float poly = (((((1.000000000004541f) + (0.3465735902890194f) * t_norm) + ((0.060056625807462106f) + (0.006938011720099898f) * t_norm) * xp_t_norm_1) + (((0.0006011625785226175f) + (4.172733231412691e-05f) * t_norm) + ((2.365903420097291e-06f) + 0.0f * t_norm) * xp_t_norm_1) * xp_t_norm_2) + ((0.0f + (6.125082344559473e-08f) * t_norm) + ((1.748460280931767e-08f) + 0.0f * t_norm) * xp_t_norm_1) * xp_t_norm_3);
     int32_t ni = (int32_t)n;
     union { float f; uint32_t u; } u2;
     u2.f = poly;
@@ -86,8 +84,7 @@ __device__ __forceinline__ float fast_exp(float x) {
     return u2.f;
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_log(float x) {
+ZERO_BRANCH_FAST float fast_log(float x) {
     if (x != x) return x;
     if (x < 0.0f) return NAN;
     if (x == 0.0f) return -INFINITY;
@@ -112,30 +109,27 @@ __device__ __forceinline__ float fast_log(float x) {
     return poly + (float)E * 0.6931471805599453f;
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_tanh(float x) {
+ZERO_BRANCH_FAST float fast_tanh(float x) {
     float t = fmaxf(fminf(x, 3.0f), -3.0f);
     float t_norm = t * 0.3333333333333333f;
     float xp_t_norm_1 = t_norm * t_norm;
     float xp_t_norm_2 = xp_t_norm_1 * xp_t_norm_1;
     float xp_t_norm_3 = xp_t_norm_2 * xp_t_norm_2;
-    float poly = (((((2.969487847122949f) * t_norm) + ((-7.802402889067842f) * t_norm) * xp_t_norm_1) + (((17.773859639427762f) * t_norm) + ((-24.99501044158473f) * t_norm) * xp_t_norm_1) * xp_t_norm_2) + (((18.619411933244926f) * t_norm) + ((-5.572284084070852f) * t_norm) * xp_t_norm_1) * xp_t_norm_3);
+    float poly = ((((0.0f + (2.969487847122949f) * t_norm) + (0.0f + (-7.802402889067842f) * t_norm) * xp_t_norm_1) + ((0.0f + (17.773859639427762f) * t_norm) + (0.0f + (-24.99501044158473f) * t_norm) * xp_t_norm_1) * xp_t_norm_2) + ((0.0f + (18.619411933244926f) * t_norm) + (0.0f + (-5.572284084070852f) * t_norm) * xp_t_norm_1) * xp_t_norm_3);
     return (x > 3.0f) ? 1.0f : ((x < -3.0f) ? -1.0f : poly);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_gelu(float x) {
+ZERO_BRANCH_FAST float fast_gelu(float x) {
     float t = fmaxf(fminf(x, 6.0f), -6.0f);
     float t_norm = t * 0.16666666666666666f;
     float xp_t_norm_1 = t_norm * t_norm;
     float xp_t_norm_2 = xp_t_norm_1 * xp_t_norm_1;
     float xp_t_norm_3 = xp_t_norm_2 * xp_t_norm_2;
-    float poly = (((((0.022644110266097854f) + (2.999999999999951f) * t_norm) + ((11.824092498638983f) ) * xp_t_norm_1) + (((-37.9505487020952f) ) + ((73.22912775958952f) ) * xp_t_norm_1) * xp_t_norm_2) + (((-67.69931551818196f) ) + ((23.596643910204122f) ) * xp_t_norm_1) * xp_t_norm_3);
+    float poly = (((((0.022644110266097854f) + (2.999999999999951f) * t_norm) + ((11.824092498638983f) + 0.0f * t_norm) * xp_t_norm_1) + (((-37.9505487020952f) + 0.0f * t_norm) + ((73.22912775958952f) + 0.0f * t_norm) * xp_t_norm_1) * xp_t_norm_2) + (((-67.69931551818196f) + 0.0f * t_norm) + ((23.596643910204122f) + 0.0f * t_norm) * xp_t_norm_1) * xp_t_norm_3);
     return (x >= 6.0f) ? x : ((x <= -6.0f) ? 0.0f : poly);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_silu(float x) {
+ZERO_BRANCH_FAST float fast_silu(float x) {
     float t = fmaxf(fminf(x, 5.0f), -5.0f);
     float t_norm = t * 0.2f;
     float xp_t_norm_1 = t_norm * t_norm;
@@ -145,8 +139,7 @@ __device__ __forceinline__ float fast_silu(float x) {
     return (x > 5.0f) ? x : ((x < -5.0f) ? 0.0f : x * poly);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_mish(float x) {
+ZERO_BRANCH_FAST float fast_mish(float x) {
     float t = fmaxf(fminf(x, 6.0f), -6.0f);
     float t_norm = t * 0.16666666666666666f;
     float xp_t_norm_1 = t_norm * t_norm;
@@ -156,19 +149,17 @@ __device__ __forceinline__ float fast_mish(float x) {
     return (x > 6.0f) ? x : ((x < -6.0f) ? 0.0f : poly);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_erf(float x) {
+ZERO_BRANCH_FAST float fast_erf(float x) {
     float t = fmaxf(fminf(x, 4.0f), -4.0f);
     float t_norm = t * 0.25f;
     float xp_t_norm_1 = t_norm * t_norm;
     float xp_t_norm_2 = xp_t_norm_1 * xp_t_norm_1;
     float xp_t_norm_3 = xp_t_norm_2 * xp_t_norm_2;
-    float poly = (((((4.4915010391978845f) * t_norm) + ((-22.770048515070297f) * t_norm) * xp_t_norm_1) + (((92.50140058434354f) * t_norm) + ((-246.3959610781379f) * t_norm) * xp_t_norm_1) * xp_t_norm_2) + ((((413.5995806869972f) * t_norm) + ((-418.00744260834665f) * t_norm) * xp_t_norm_1) + (((231.11308925140585f) * t_norm) + ((-53.533287980256496f) * t_norm) * xp_t_norm_1) * xp_t_norm_2) * xp_t_norm_3);
+    float poly = ((((0.0f + (4.4915010391978845f) * t_norm) + (0.0f + (-22.770048515070297f) * t_norm) * xp_t_norm_1) + ((0.0f + (92.50140058434354f) * t_norm) + (0.0f + (-246.3959610781379f) * t_norm) * xp_t_norm_1) * xp_t_norm_2) + (((0.0f + (413.5995806869972f) * t_norm) + (0.0f + (-418.00744260834665f) * t_norm) * xp_t_norm_1) + ((0.0f + (231.11308925140585f) * t_norm) + (0.0f + (-53.533287980256496f) * t_norm) * xp_t_norm_1) * xp_t_norm_2) * xp_t_norm_3);
     return (x > 4.0f) ? 1.0f : ((x < -4.0f) ? -1.0f : poly);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_exact_gelu(float x) {
+ZERO_BRANCH_FAST float fast_exact_gelu(float x) {
     float t = fmaxf(fminf(x, 5.0f), -5.0f);
     float t_norm = t * 0.2f;
     float xp_t_norm_1 = t_norm * t_norm;
@@ -178,8 +169,7 @@ __device__ __forceinline__ float fast_exact_gelu(float x) {
     return (x >= 5.0f) ? x : ((x <= -5.0f) ? 0.0f : poly);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_rsqrt_core(float x) {
+ZERO_BRANCH_FAST float fast_rsqrt_core(float x) {
     float t = fmaxf(fminf(x, 4.0f), 1.0f);
     float t_norm = t * 0.6666666666666666f + -1.6666666666666667f;
     float xp_t_norm_1 = t_norm * t_norm;
@@ -190,23 +180,20 @@ __device__ __forceinline__ float fast_rsqrt_core(float x) {
 }
 
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_double_mish(float x) {
+ZERO_BRANCH_FAST float fast_double_mish(float x) {
     return fast_mish(fast_mish(x));
 }
 
 constexpr float ATAN2_PI = 3.14159265358979323846f;
 constexpr float ATAN2_PI_2 = 1.57079632679489661923f;
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float sign_bit(float x) {
+ZERO_BRANCH_FAST float sign_bit(float x) {
     union { float f; uint32_t u; } u;
     u.f = x;
     return (float)(u.u >> 31);
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_atan2(float y, float x) {
+ZERO_BRANCH_FAST float fast_atan2(float y, float x) {
     float sx = sign_bit(x);
     float sy = sign_bit(y);
     float ax = fabsf(x);
@@ -216,6 +203,7 @@ __device__ __forceinline__ float fast_atan2(float y, float x) {
     float num = cond ? ax : ay;
     float den = cond ? ay : ax;
     
+    // 【核心修复】防除零，且不篡改极小值
     float t = (den == 0.0f) ? 0.0f : num / den;
     t = fminf(t, 1.0f); 
     
@@ -232,8 +220,7 @@ __device__ __forceinline__ float fast_atan2(float y, float x) {
     return final_angle;
 }
 
-ZERO_BRANCH_FAST
-__device__ __forceinline__ float fast_rsqrt(float x) {
+ZERO_BRANCH_FAST float fast_rsqrt(float x) {
     if (x <= 0.0f) return x == 0.0f ? INFINITY : NAN;
     union { float f; uint32_t i; } conv;
     conv.f = x;
