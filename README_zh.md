@@ -4,57 +4,32 @@
 
 > **极速无分支数学库 —— 专为游戏物理引擎、实时渲染与 AI 推理设计。**
 >
-> 该项目使用的协议为：`Apache-2.0`
+> 协议：`Apache-2.0`
 
-通过极值逼近与 Estrin 树求值结构，将复杂的超越函数（如 `sin`, `cos`, `tanh`）坍缩为纯 FMA（乘加融合）指令。极大规避了标准库中冗余的分支判断与异常处理，榨干硅片的每一滴算力。
+通过极值逼近与 Estrin 树求值结构，将复杂的超越函数（如 `sin`, `cos`, `tanh`）坍缩为纯 FMA（乘加融合）指令。极大规避了标准库中冗余的分支判断，榨干硅片的每一滴算力。
 
-## ⚡ 跑分对比 (Benchmarks)
+## ⚡ 核心性能亮点
 
-> 测试环境：Windows 11 / GCC 13.2 (`-O3 -march=native -fopenmp`) / 多核并发
+> **测试环境**：Windows 11 / GCC 13.2 (`-O3 -march=native`) / 原生多线程并发
 
-### 🚀 1900+帧/秒的实时 SDF 渲染效果（纯 CPU 实现）
+得益于极简的纯 FMA 架构与编译器指令级优化，Zero-Branch-Math 在不改变全局编译参数的情况下，依然跑出极其恐怖的性能：
 
-*   **任务**：渲染一个复杂的 1000x1000 尺寸的 SDF 图形，具有平滑的 `erf` 抗锯齿效果以及谐波失真效果。
-*   **技术架构**：原生 Win32 API、无锁线程池（支持 16 核处理器）、Zero-Branch-Math 计算引擎。
+*   🚀 **基础数学函数** (`sin/cos/atan2`)：相比 `std::` 库，实现 **2x ~ 3x** 的算力碾压。
+*   🚀 **AI 激活函数** (`erf/gelu/mish`)：消除冗长级数展开，实现 **1.5x ~ 7x** 的加速。
+*   🚀 **物理引擎端到端集成**：在 10 万粒子复杂模拟中，实现 **2x** 以上的帧率提升。
+*   🚀 **极限渲染**：纯 CPU 实时渲染 1000x1000 的 SDF，帧率突破 **1900 FPS**。
 
-| 引擎 | 计算时间（毫秒） | 帧率（FPS） | 加速比 |
-| :--- | :--- | :--- | :--- |
-| `std::`系统 | 2.57 ms | 325.8 | 1.00x |
-| **Zero-Branch-Math** | **0.75 ms** | **1903.1** | **3.42x** |
+*(📊 查看具体耗时与精度误差：请参阅 [详细跑分报告](docs/benchmarks.md))*
 
-<details>
-<summary><b>👉 点击展开查看详细基准与物理模拟数据 (Click to expand)</b></summary>
+## 🖼️ 视觉 Demo 演示
 
-#### 核心算子微基准测试
-| 算子 | 耗时 (s) | 加速比 | 精度表现 |
-| :--- | :--- | :--- | :--- |
-| `sin / cos / tanh` (混合 1 亿次) | 0.0136 (std: 0.0362) | **2.65x** | 误差 < 5.6e-03 |
-| `atan2(y,x)` (四象限查询) | 0.0180 (std: 0.0367) | **2.03x** | 误差 < 4.7e-07 rad |
-| `erf(x)` | 0.0069 (std: 0.0093) | **1.33x** | 误差 < 1e-04 |
-| `log(x)` | 0.0052 (std: 0.0064) | **1.22x** | 误差 < 1e-05 |
-| `exp(x)` | 0.0072 (std: 0.0050) | 0.69x | 误差 < 1e-05 (注1) |
+> 渲染均由原生 Win32 API + Zero-Branch-Math 驱动，纯 CPU 运算
 
-#### 2. 10 万粒子复杂物理模拟 (带非线性阻尼与高频叠加)
-| 算子库 | 物理耗时 (ms) | 加速比 | 最大坐标漂移误差 |
-| :--- | :--- | :--- | :--- |
-| System `std::` | 7.75 | 1.00x | 0.0 (基准) |
-| **Zero-Branch-Math** | **3.77** | **2.05x** | **4.14e-02 (像素级完全不可见)** |
-
-> **注 1 (`exp` 的特别说明)**：在现代桌面级 x86 CPU 上，`std::exp` 具有底层硬件指令（如 `MUFU.EX2`）加速，纯软件多项式很难在速度上超越硬件。`fast_exp` 主要面向**无硬件 FPU 的嵌入式设备（ARM MCU, RISC-V）**，作为软件后备方案。
-> 
-> **💡 关于精度说明**：由于单精度（float32）在极小值域拟合的物理极限，`fast_tanh` 的最大绝对误差为 `5.6e-03`。然而在真实的物理引擎累加中，最终坐标漂移仅有 `0.04` 个像素，视觉效果绝对完美。如果您需要全区间 `1e-06` 的极限精度，请联系作者获取定制版本。
-
-</details>
-
-## Demo 演示
-
-> **提示:**若图片加载有问题，可进入assets文件夹查看
-
-### 极光
+### 动态极光星云 (Aurora)
 ![aurora](assets/aurora-atan2/aurora.jpg)
 
 <details>
-<summary><b>更多图片展示</b></summary>
+<summary><b>👉 点击展开更多视觉演示</b></summary>
 
 ### atan2
 ![atan2](assets/atan2/atan2.jpg)
@@ -69,51 +44,37 @@
 
 ## 📦 支持的算子
 
-目前开源的纯 C++ 版本包含以下高频核心算子（内置单周期周期规约与饱和截断，绝对安全）：
+目前开源版本包含以下高频核心算子（内置周期规约与无分支饱和截断）：
 
-| 算子名称 | 说明 | 精度/加速比 |
-| :--- | :--- | :--- |
-| `fast_sin(x)` / `fast_cos(x)` | 拟合区间 [-π, π]，内置周期规约 | 误差 < 1e-06 |
-| `fast_tanh(x)` | 拟合区间 [-5, 5]，外围饱和截断 | 误差 < 5e-03 |
-| `fast_erf(x)` | AI 误差函数，消除级数展开 | **1.33x speedup** |
-| `fast_log(x)` | 极速对数，消除异常分支 | **1.22x speedup** |
-| `fast_exp(x)` | 专为无 FPU 嵌入式设备设计的后备方案 | 误差 < 1e-05 |
-| `fast_atan2(y, x)` | 全象限无分支空间映射 | **2.03x speedup** |
-| `fast_rsqrt(x)` | IEEE 754 拆解，计算 1/√x | 误差 < 1e-06 |
+| 算子名称 | 说明 |
+| :--- | :--- |
+| `fast_sin(x)` / `fast_cos(x)` | 极速三角周期规约 |
+| `fast_tanh(x)` | 双曲正切，外围安全饱和 |
+| `fast_erf(x)` | AI 误差函数，消除级数展开 |
+| `fast_log(x)` | 极速对数，消除异常分支 |
+| `fast_exp(x)` | 专为无 FPU 嵌入式设备设计的软件后备 |
+| `fast_atan2(y, x)` | 全象限无分支空间映射 |
+| `fast_rsqrt(x)` | IEEE 754 拆解，计算 1/√x |
+| `fast_gelu(x)` / `fast_silu(x)` / `fast_mish(x)` | AI 核心激活函数 |
 
-*(误差控制在 `1e-06` 级别，完美满足图形学与 AI 推理的精度甜点)*
-
-
-###  Roadmap (下一步待优化的算子)
-
-*   [ ] `fast_sincos(x, *s, *c)`：图形学核心组合算子，共享映射开销，一次求出双结果。
-*   [ ] `fast_pow(x, y)`：利用现有 `fast_log` 与 `fast_exp` 组合，极速计算任意次方。
-*   [ ] `fast_sigmoid(x)`：面向 AI 推理的纯多项式激活函数。
-*   [ ] `fast_asin(x)` / `fast_acos(x)`：彻底解决接近 ±1 时的精度灾难。
-
----
+*(更多精度测试细节见 [算子说明书](docs/supported_ops.md))*
 
 ## 🛠️ 快速上手
 
-### 运行 demo
-可直接运行 demo 内的 bat 脚本
+Zero-Branch-Math 是一个 **单头文件库（Header-Only）**。只需将 `include/cpu/zero_branch_math.h` 拷入你的工程，直接 `#include` 即可，无需链接任何第三方动态库。
 
-因为 `Zero-Branch-Math` 内部生成了极其精简的 FMA（乘加融合）指令，**请务必使用以下优化参数进行编译**，否则编译器将无法发挥其真实性能（尤其是 `-march=native`，它决定了能否使用您 CPU 最新的 AVX 指令集）：
+### 推荐编译参数
+为了榨干 CPU 的每一滴向量化算力，请务必开启以下优化参数：
+*   **GCC/Clang**: `-O3 -march=native`
+*   **MSVC**: `/O2` (最大优化) + `/fp:fast` (快速浮点模型) + `AVX2`
 
-**Visual Studio (MSVC):**
-请在项目属性中设置：
-*   C/C++ -> 优化 -> 优化 -> **最大优化 (/O2)** (或 /O3)
-*   C/C++ -> 代码生成 -> 启用增强指令集 -> **高级矢量扩展 (AVX2)**
-*   C/C++ -> 代码生成 -> 浮点模型 -> **快速 (/fp:fast)**
-```
-只需将 `include/cpu/fast_math.h` 拷入你的工程，直接 `#include` 即可，无需链接任何第三方动态库：
-
+### 示例代码
 ```cpp
-#include "fast_math.h"
+#include "zero_branch_math.h"
 
 int main() {
     float angle = 1.234f;
-    float s = fast_sin(angle); // 极致丝滑
+    float s = fast_sin(angle); 
     float t = fast_tanh(angle);
     return 0;
 }
@@ -121,36 +82,14 @@ int main() {
 
 ---
 
-## 📚 文档
-*   [支持的算子](docs/supported_ops.md)
-*   [跑分对比](docs/benchmarks.md)
-*   [架构与原理](docs/architecture.md)
+## 📚 相关文档
+*   [支持的算子与精度列表](docs/supported_ops.md)
+*   [详细跑分对比报告](docs/benchmarks.md)
+*   [架构与底层原理](docs/architecture.md)
+*   [极限边界测试(25/25通过)](examples/Extreme_Edge-Case/README.md)
 
 ---
 
-## 仓库架构
-
-```text
-Zero-Branch-Math/
-├── README.md
-├── LICENSE
-├── .gitignore
-│
-├── include/                   # 【核心】即插即用的头文件
-│   ├── cpu/
-│   └── gpu/
-│
-├── examples/                  # Demo 演示区
-│
-├── docs/
-│   ├── benchmarks.md          # 详细跑分说明（软硬件环境、编译参数）
-│   ├── supported_ops.md       # 所有算子列表与精度误差表
-│   └── architecture.md        # 深度解析
-│
-├── benchmarks/                # 复现跑分的测试脚本
-│
-└── assets/                    # 资产：demo出图
-```
-
-## 联系方式
-如果你需要为特有的数学公式定制极速 FMA 内核？底层母机引擎可提供企业级定制，联系：`邮箱：azqwerrty@163.com`
+## 💼 商业合作
+如果您有特定的私有数学公式（如期权定价模型、特定的 AI 复合算子）需要极速 FMA 内核定制，请联系作者：
+**邮箱：azqwerrty@163.com**

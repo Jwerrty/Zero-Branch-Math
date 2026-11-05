@@ -48,7 +48,5 @@ This suite aggressively attacks the library with pathological inputs to ensure m
 In `compile.bat`, we **do not** use the `-ffast-math` flag for unit tests. Why? Because `-ffast-math` strips away `NaN`/`Inf` protections, making standard library comparisons invalid.
 *在 `compile.bat` 中，我们**没有**为单元测试开启 `-ffast-math` 标志。为什么？因为 `-ffast-math` 会剥离 `NaN`/`Inf` 的保护，导致标准库的对比失效。*
 
-However, **Zero-Branch-Math** uses `__builtin_inff()` and `__builtin_nanf("")` for edge cases. This guarantees 100% IEEE 754 compatibility *even if* you compile your production code with `-ffast-math`.
-
 ---
 *Happy hacking, and stay safe! / 尽情敲代码吧，保持安全！*
