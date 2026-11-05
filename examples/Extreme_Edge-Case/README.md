@@ -40,8 +40,6 @@ This suite aggressively attacks the library with pathological inputs to ensure m
     *   Testing `fast_log(0.0f)` and `fast_log(-1.0f)`. Ensures it returns exact `-Inf` and `NaN` without polluting subsequent calculations. (Safe / 安全)
 3.  **AI Gradient Cliffs**:
     *   Testing `fast_mish(-10.0f)` and `fast_silu(-10.0f)`. Ensures outputs smoothly converge to `0.0` rather than jumping to a discontinuous constant. (Safe / 安全)
-4.  **L2 Physical Priors**:
-    *   Testing `fast_rational_gelu(0.0f)`. Ensures the rational function strictly outputs `0.0` at the origin. (Safe / 安全)
 
 ## ⚠️ A Note on `-ffast-math` / 关于 `-ffast-math` 的特别说明
 

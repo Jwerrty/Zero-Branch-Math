@@ -17,7 +17,7 @@
 *   🚀 **基础数学函数** (`sin/cos/atan2`)：相比 `std::` 库，实现 **2x ~ 3x** 的算力碾压。
 *   🚀 **AI 激活函数** (`erf/gelu/mish`)：消除冗长级数展开，实现 **1.5x ~ 7x** 的加速。
 *   🚀 **物理引擎端到端集成**：在 10 万粒子复杂模拟中，实现 **2x** 以上的帧率提升。
-*   🚀 **极限渲染**：纯 CPU 实时渲染 1000x1000 的 SDF，帧率突破 **1900 FPS**。
+*   🚀 **极限渲染**：纯 CPU 实时渲染 1000x1000 的 SDF，帧率突破 **1000 FPS**。
 
 *(📊 查看具体耗时与精度误差：请参阅 [详细跑分报告](docs/benchmarks.md))*
 
@@ -86,7 +86,7 @@ int main() {
 *   [支持的算子与精度列表](docs/supported_ops.md)
 *   [详细跑分对比报告](docs/benchmarks.md)
 *   [架构与底层原理](docs/architecture.md)
-*   [极限边界测试(25/25通过)](examples/Extreme_Edge-Case/README.md)
+*   [极限边界测试(23/23通过)](examples/Extreme_Edge-Case/README.md)
 
 ---
 

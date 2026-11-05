@@ -17,7 +17,7 @@ Thanks to the minimalist pure FMA architecture and compiler instruction-level op
 *   🚀 **Basic Math Functions** (`sin/cos/atan2`): Achieves a **2x ~ 3x** computing power crush compared to `std::`.
 *   🚀 **AI Activation Functions** (`erf/gelu/mish`): Eliminates lengthy series expansions, achieving a **1.5x ~ 7x** speedup.
 *   🚀 **End-to-End Physics Integration**: Achieves **>2x** frame rate improvement in 100K particle complex simulations.
-*   🚀 **Extreme Rendering**: Real-time 1000x1000 SDF rendering on pure CPU, breaking through **1900 FPS**.
+*   🚀 **Extreme Rendering**: Real-time 1000x1000 SDF rendering on pure CPU, breaking through **1000 FPS**.
 
 *(📊 View detailed timings and precision errors: Refer to [Detailed Benchmarks](docs/benchmarks.md))*
 
@@ -86,7 +86,7 @@ int main() {
 *   [Supported Operators & Precision List](docs/supported_ops.md)
 *   [Detailed Benchmarks Report](docs/benchmarks.md)
 *   [Architecture & Underlying Principles](docs/architecture.md)
-*   [Extreme Edge-Case Tests (25/25 Passed)](examples/Extreme_Edge-Case/README.md)
+*   [Extreme Edge-Case Tests (23/23 Passed)](examples/Extreme_Edge-Case/README.md)
 
 ---
 
