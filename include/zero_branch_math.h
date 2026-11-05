@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <cstring>
 
-// 编译器极速优化属性
 #if defined(__clang__)
     #define ZERO_BRANCH_FAST
 #elif defined(__GNUC__)
@@ -12,7 +11,6 @@
     #define ZERO_BRANCH_FAST
 #endif
 
-// CUDA 兼容宏
 #ifndef __CUDACC__
 #define __device__
 #define __forceinline__ inline
@@ -218,7 +216,6 @@ __device__ __forceinline__ float fast_atan2(float y, float x) {
     float num = cond ? ax : ay;
     float den = cond ? ay : ax;
     
-    // 【核心修复】防除零，且不篡改极小值
     float t = (den == 0.0f) ? 0.0f : num / den;
     t = fminf(t, 1.0f); 
     

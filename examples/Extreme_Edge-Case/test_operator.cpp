@@ -34,7 +34,6 @@ int main() {
     cout << fixed << setprecision(6);
     cout << "=== Zero-Branch-Math 母机生成代码终极单元测试 ===" << endl;
 
-    // 1. 基础三角函数
     cout << "\n[Testing sin]" << endl;
     check_close("sin", 0.0f, fast_sin(0.0f), std::sin(0.0f), 1e-6f);
     check_close("sin", 1.570796f, fast_sin(1.570796f), std::sin(1.570796f), 1e-5f);
@@ -44,11 +43,9 @@ int main() {
     check_close("cos", 0.0f, fast_cos(0.0f), std::cos(0.0f), 1e-6f);
     check_close("cos", 3.141592f, fast_cos(3.141592f), std::cos(3.141592f), 1e-5f);
 
-    // 2. 指数与对数
     cout << "\n[Testing exp]" << endl;
     check_close("exp", 0.0f, fast_exp(0.0f), std::exp(0.0f), 1e-5f);
     check_close("exp", -10.0f, fast_exp(-10.0f), std::exp(-10.0f), 1e-6f); 
-    // 【核心修复】放宽阈值到 3e-3 以适应 fast-math 的加法重排误差
     check_close("exp", 10.0f, fast_exp(10.0f), std::exp(10.0f), 3e-3f);
 
     cout << "\n[Testing log]" << endl;
@@ -56,7 +53,6 @@ int main() {
     check_close("log", 2.718281f, fast_log(2.718281f), std::log(2.718281f), 1e-5f);
     check_close("log", 100.0f, fast_log(100.0f), std::log(100.0f), 1e-4f);
     
-    // 【核心修复】兼容 fast-math 把 -INFINITY 变成 -FLT_MAX 的行为
     float log_zero = fast_log(0.0f);
     if (std::isinf(log_zero) || log_zero <= -3.402823e38f) {
         cout << "[PASS] log(0.000000) = -Inf (or -FLT_MAX)" << endl;
@@ -67,7 +63,6 @@ int main() {
     }
     check_close("log", -1.0f, fast_log(-1.0f), std::log(-1.0f), 1e-6f); 
 
-    // 3. AI 激活函数
     cout << "\n[Testing tanh]" << endl;
     check_close("tanh", 0.0f, fast_tanh(0.0f), std::tanh(0.0f), 1e-6f);
     check_close("tanh", 10.0f, fast_tanh(10.0f), std::tanh(10.0f), 1e-4f); 
@@ -93,7 +88,6 @@ int main() {
     check_close("erf", 1.0f, fast_erf(1.0f), std::erf(1.0f), 5e-3f); 
     check_close("erf", 10.0f, fast_erf(10.0f), 1.0f, 1e-5f);
 
-    // 最终报告
     cout << "\n==========================================" << endl;
     cout << "测试完成！" << endl;
     cout << "通过: " << passed << " 项" << endl;
